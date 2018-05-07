@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="http://libs.baidu.com/jquery/1.7.2/jquery.min.js"></script>
+</head>
+<body>
+<input type="date" id="dateS">
+<p id="lunar">请选择阳历生日</p>
+<script src="lunar.js"></script>
+<script>
+    $(document).ready(() => {
+        let getAnimal = (lanyear) => {
+            let Animals = ["鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊", "猴", "鸡", "狗", "猪"];
+            return Animals[(lanyear - 4) % 12];
+        };
+
+        let getAstro = (M, D) => {
+            if (D < 10) D = '0' + D;
+            let arr = [119, 218, 320, 419, 520, 621, 722, 822, 922, 1023, 1122, 1221];
+            let str = '魔羯水瓶双鱼白羊金牛双子巨蟹狮子处女天秤天蝎射手摩羯';
+            let bN = Number('' + M + D);
+            arr.push(bN);
+            arr.sort(function (a, b) {
+                return a - b;
+            });
+            let index = arr.indexOf(bN);
+            return str.substr(arr.indexOf(bN) * 2, 2) + '座';
+        };
+
+        let getAge = (birthDate)=> {
+            let bY = birthDate.getFullYear();
+            let bM = birthDate.getMonth() + 1;
+            let bD = birthDate.getDate();
+            let now = new Date();
+            let nY = now.getFullYear();
+            let nM = now.getMonth() + 1;
+            let nD = now.getDate();
+            let age = nY - bY;
+            if (bM > nM || (bM === nM && bD > nD)) {
+                age -= 1;
+            }
+            if(age < 0){
+                age = '还没有出生哦';
+            }
+            return age;
+        };
+
+        $('#dateS').on('change', (e) => {
+            let el = $(e.currentTarget);
+
+            //  选择的时间戳
+            let dateT = new Date(el.val());
+            let timeStamp = dateT.getTime();
+
+            //  农历日期
+            let lunarYear = lunarFigure.lunarDate(timeStamp);
+            let year = lunarYear.year;
+            let str = `<span>农历生日：${year}年${lunarYear.month}月${Math.floor(lunarYear.day)}日</span>`;
+
+            //  属相
+            let animal = getAnimal(year);
+            str += `<br><span>属相：${animal}</span>`;
+
+            //  星座
+            let birthDate = new Date();
+            let bM = dateT.getMonth() + 1;
+            let bD = dateT.getDate();
+            let astro = getAstro(bM, bD);
+            str += `<br><span>星座：${astro}</span>`;
+
+            //  年龄
+            let age = getAge(dateT);
+            str += `<br><span>年龄：${age}</span>`;
+
+            $('#lunar').html(str);
+        })
+    });
+</script>
+</body>
+</html>
